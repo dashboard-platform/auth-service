@@ -1,5 +1,7 @@
 # Auth Service
 
+![coverage](https://img.shields.io/badge/coverage-35.4%25-orange)
+
 The `auth-service` is a microservice responsible for handling user registration, login, and identity verification within a distributed system. It generates and validates JWT tokens for authentication and communicates via HTTP.
 
 ## Features
