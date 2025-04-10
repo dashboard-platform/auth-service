@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       - DB_URL=host=postgres user=postgres password=secret dbname=authdb port=5432 sslmode=disable
       - JWT_SECRET=supersecretkey
