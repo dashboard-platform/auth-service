@@ -1,0 +1,3 @@
+curl -X POST http://localhost:8080/register -H "Content-Type: application/json" -d "{\"email\":\"test@test.ro\",\"password\":\"test\"}"
+curl -X POST http://localhost:8080/login -H "Content-Type: application/json" -d "{\"email\":\"test@test.ro\",\"password\":\"test\"}"
+curl -X GET http://localhost:8080/me -H "Authorization: Bearer <token from login>"
