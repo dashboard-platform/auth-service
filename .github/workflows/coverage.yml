@@ -22,4 +22,4 @@ jobs:
 
       - name: Print summary
         run: |
-          tail -n 1 coverage.txt | awk '{print \"Coverage: \"$3}' >> $GITHUB_STEP_SUMMARY
+          tail -n 1 coverage.txt | awk '{print "Coverage: "$3}' >> $GITHUB_STEP_SUMMARY
