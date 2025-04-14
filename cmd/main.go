@@ -76,10 +76,10 @@ func main() {
 	h := handler.New(auth.NewService(db), &jwtObj)
 
 	// Define HTTP routes.
-	app.Get("/healthcheck", h.Healthcheck)
-	app.Post("/register", h.Register)
-	app.Post("/login", h.Login)
-	app.Get("/me", middleware.RequireAuth(&jwtObj), h.GetMe)
+	app.Get("/auth/healthcheck", h.Healthcheck)
+	app.Post("/auth/register", h.Register)
+	app.Post("/auth/login", h.Login)
+	app.Get("/auth/me", middleware.RequireAuth(&jwtObj), h.GetMe)
 
 	// Start the HTTP server.
 	log.Info().Msgf("Authentication Service started on %s", c.Port)

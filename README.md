@@ -77,9 +77,9 @@ go tests -v ./...
 
 | Method | Path         | Auth Required | Description                       |
 |--------|--------------|----------------|-----------------------------------|
-| GET    | `/healthcheck` | ❌             | Basic service status              |
-| POST   | `/register`    | ❌             | Create new user account           |
-| POST   | `/login`       | ❌             | Authenticate user and return JWT  |
-| GET    | `/me`          | ✅             | Return current user's information |
+| GET    | `/auth/healthcheck` | ❌             | Basic service status              |
+| POST   | `/auth/register`    | ❌             | Create new user account           |
+| POST   | `/auth/login`       | ❌             | Authenticate user and return JWT  |
+| GET    | `/auth/me`          | ✅             | Return current user's information |
 
 > ⚠️ The `/logout` logic should be handled by the API Gateway, not this service.
