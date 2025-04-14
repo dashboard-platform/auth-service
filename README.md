@@ -1,6 +1,8 @@
 # Auth Service
 
-![coverage](https://img.shields.io/badge/coverage-80.5%25-green)
+![coverage](https://img.shields.io/badge/coverage-80.5%25-green) ![go-report](https://goreportcard.com/badge/github.com/dashboard-platform/auth-service) [![Go Reference](https://pkg.go.dev/badge/github.com/dashboard-platform/auth-service.svg)](https://pkg.go.dev/github.com/dashboard-platform/auth-service)
+
+
 
 The `auth-service` is a microservice responsible for handling user registration, login, and identity verification within a distributed system. It generates and validates JWT tokens for authentication and communicates via HTTP.
 
