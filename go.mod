@@ -1,4 +1,4 @@
-module github.com/dashboard-platform/auth-service.git
+module github.com/dashboard-platform/auth-service
 
 go 1.23.0
 
