@@ -8,7 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RequireAuth(jwt *auth.JWTObj) fiber.Handler {
+func RequireAuth(jwt auth.JWTValidator) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := c.Cookies("access_token")
 		if token == "" {

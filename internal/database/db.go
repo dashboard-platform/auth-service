@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"auth-service/models"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"

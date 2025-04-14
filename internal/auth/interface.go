@@ -7,3 +7,7 @@ type ServiceInterface interface {
 	Login(data models.LoginAPI) (string, error)
 	GetUserByID(id string) (models.User, error)
 }
+
+type JWTValidator interface {
+	ValidateJWT(token string) (string, error)
+}

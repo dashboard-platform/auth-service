@@ -8,6 +8,7 @@ import (
 
 	"auth-service/internal/auth"
 	"auth-service/models"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -30,7 +31,6 @@ func setupTestApp() (*fiber.App, *auth.MockService) {
 
 	return app, fakeService
 }
-
 func TestHandlers_Healthcheck(t *testing.T) {
 	app, _ := setupTestApp()
 

@@ -54,5 +54,5 @@ func (m *MockupDatabase) FetchByID(id string) (models.User, error) {
 }
 
 func (m *MockupDatabase) Close() {
-	return
+	// No action needed for mockup database
 }
