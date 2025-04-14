@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"auth-service/internal/auth"
-	"auth-service/models"
+	"github.com/dashboard-platform/auth-service/internal/auth"
+	"github.com/dashboard-platform/auth-service/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
 )

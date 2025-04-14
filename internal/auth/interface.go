@@ -1,6 +1,6 @@
 package auth
 
-import "auth-service/models"
+import "github.com/dashboard-platform/auth-service/models"
 
 type ServiceInterface interface {
 	Register(data models.RegisterAPI) (string, error)

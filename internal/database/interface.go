@@ -1,6 +1,6 @@
 package database
 
-import "auth-service/models"
+import "github.com/dashboard-platform/auth-service/models"
 
 type Repository interface {
 	AutoMigrate() error

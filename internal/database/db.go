@@ -4,8 +4,7 @@ import (
 	"os"
 	"time"
 
-	"auth-service/models"
-
+	"github.com/dashboard-platform/auth-service/models"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"

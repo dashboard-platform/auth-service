@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"auth-service/models"
+	"github.com/dashboard-platform/auth-service/models"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )

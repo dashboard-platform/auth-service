@@ -1,9 +1,10 @@
 package auth
 
 import (
-	"auth-service/models"
 	"testing"
 	"time"
+
+	"github.com/dashboard-platform/auth-service/models"
 
 	"github.com/stretchr/testify/require"
 )

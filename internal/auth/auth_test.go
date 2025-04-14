@@ -3,8 +3,8 @@ package auth
 import (
 	"testing"
 
-	"auth-service/internal/database"
-	"auth-service/models"
+	"github.com/dashboard-platform/auth-service/internal/database"
+	"github.com/dashboard-platform/auth-service/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -3,8 +3,7 @@ package middleware
 import (
 	"strings"
 
-	"auth-service/internal/auth"
-
+	"github.com/dashboard-platform/auth-service/internal/auth"
 	"github.com/gofiber/fiber/v2"
 )
 

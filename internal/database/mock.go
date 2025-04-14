@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"auth-service/models"
+	"github.com/dashboard-platform/auth-service/models"
 )
 
 type MockupDatabase struct {

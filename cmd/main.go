@@ -3,12 +3,12 @@ package main
 import (
 	"time"
 
-	"auth-service/internal/auth"
-	"auth-service/internal/config"
-	"auth-service/internal/database"
-	"auth-service/internal/handler"
-	"auth-service/internal/logger"
-	"auth-service/internal/middleware"
+	"github.com/dashboard-platform/auth-service/internal/auth"
+	"github.com/dashboard-platform/auth-service/internal/config"
+	"github.com/dashboard-platform/auth-service/internal/database"
+	"github.com/dashboard-platform/auth-service/internal/handler"
+	"github.com/dashboard-platform/auth-service/internal/logger"
+	"github.com/dashboard-platform/auth-service/internal/middleware"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"

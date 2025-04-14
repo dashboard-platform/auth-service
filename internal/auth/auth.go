@@ -5,8 +5,8 @@ import (
 	"net/mail"
 	"time"
 
-	"auth-service/internal/database"
-	"auth-service/models"
+	"github.com/dashboard-platform/auth-service/internal/database"
+	"github.com/dashboard-platform/auth-service/models"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
