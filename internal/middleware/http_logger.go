@@ -1,3 +1,5 @@
+// Package middleware provides reusable middleware components for the application.
+// These include authentication, logging, and other request/response processing utilities.
 package middleware
 
 import (
@@ -8,6 +10,14 @@ import (
 	"github.com/rs/zerolog"
 )
 
+// RequestLogger logs details about incoming HTTP requests and their responses.
+// It logs the method, path, status, latency, and user ID (if available).
+//
+// Parameters:
+//   - logger: A zerolog.Logger instance for logging.
+//
+// Returns:
+//   - fiber.Handler: The middleware handler function.
 func RequestLogger(logger zerolog.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		start := time.Now()

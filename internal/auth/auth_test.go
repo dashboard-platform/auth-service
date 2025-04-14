@@ -1,3 +1,7 @@
+// Package auth provides core authentication functionalities, including user registration,
+// login, password hashing and verification, and JWT token management. It is designed
+// to handle secure authentication workflows and integrate with the application's database
+// and middleware layers.
 package auth
 
 import (
@@ -9,14 +13,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestService_Register tests the Register method of the authentication service.
+// It verifies that valid registration data creates a new user and invalid data
+// returns appropriate errors.
 func TestService_Register(t *testing.T) {
 	auth := NewService(database.NewMockupDatabase())
 
 	tests := []struct {
-		name         string
-		data         models.RegisterAPI
-		expectedData bool
-		expectedErr  bool
+		name         string             // Name of the test case.
+		data         models.RegisterAPI // Input data for the Register method.
+		expectedData bool               // Expected result: true if registration succeeds.
+		expectedErr  bool               // Expected error: true if an error is expected.
 	}{
 		{
 			name: "Register valid",
@@ -55,9 +62,11 @@ func TestService_Register(t *testing.T) {
 			assert.Equal(t, tt.expectedErr, err != nil)
 		})
 	}
-
 }
 
+// TestService_Login tests the Login method of the authentication service.
+// It verifies that valid login credentials return the correct user ID and
+// invalid credentials return appropriate errors.
 func TestService_Login(t *testing.T) {
 	auth := NewService(database.NewMockupDatabase())
 	expectedID, err := auth.Register(models.RegisterAPI{
@@ -69,10 +78,10 @@ func TestService_Login(t *testing.T) {
 	}
 
 	tests := []struct {
-		name         string
-		data         models.LoginAPI
-		expectedData bool
-		expectedErr  bool
+		name         string          // Name of the test case.
+		data         models.LoginAPI // Input data for the Login method.
+		expectedData bool            // Expected result: true if login succeeds.
+		expectedErr  bool            // Expected error: true if an error is expected.
 	}{
 		{
 			name: "Login valid",

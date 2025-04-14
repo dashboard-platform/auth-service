@@ -1,3 +1,7 @@
+// Package auth provides core authentication functionalities, including user registration,
+// login, password hashing and verification, and JWT token management. It is designed
+// to handle secure authentication workflows and integrate with the application's database
+// and middleware layers.
 package auth
 
 import (
@@ -9,6 +13,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestNewMockService tests the creation of a new mock authentication service.
+// It verifies that the mock service and its internal data structures are properly initialized.
 func TestNewMockService(t *testing.T) {
 	mockService := NewMockService()
 	require.NotNil(t, mockService)
@@ -16,13 +22,16 @@ func TestNewMockService(t *testing.T) {
 	require.NotNil(t, mockService.logins)
 }
 
+// TestMockRegister tests the Register method of the mock authentication service.
+// It verifies that valid registration data creates a new user and invalid data
+// returns appropriate errors.
 func TestMockRegister(t *testing.T) {
 	mockService := NewMockService()
 
 	tests := []struct {
-		name          string
-		input         models.RegisterAPI
-		expectedError bool
+		name          string             // Name of the test case.
+		input         models.RegisterAPI // Input data for the Register method.
+		expectedError bool               // Expected error: true if an error is expected.
 	}{
 		{
 			name: "Valid registration",
@@ -64,6 +73,9 @@ func TestMockRegister(t *testing.T) {
 	}
 }
 
+// TestMockLogin tests the Login method of the mock authentication service.
+// It verifies that valid login credentials return the correct user ID and
+// invalid credentials return appropriate errors.
 func TestMockLogin(t *testing.T) {
 	mockService := NewMockService()
 	user := models.RegisterAPI{
@@ -77,9 +89,9 @@ func TestMockLogin(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		input         models.LoginAPI
-		expectedError bool
+		name          string          // Name of the test case.
+		input         models.LoginAPI // Input data for the Login method.
+		expectedError bool            // Expected error: true if an error is expected.
 	}{
 		{
 			name: "Valid login",
@@ -129,6 +141,8 @@ func TestMockLogin(t *testing.T) {
 	}
 }
 
+// TestMockGetUserByID tests the GetUserByID method of the mock authentication service.
+// It verifies that valid user IDs return the correct user data and invalid IDs return errors.
 func TestMockGetUserByID(t *testing.T) {
 	mockService := NewMockService()
 	user := models.RegisterAPI{
@@ -142,9 +156,9 @@ func TestMockGetUserByID(t *testing.T) {
 	}
 
 	tests := []struct {
-		name          string
-		input         string
-		expectedError bool
+		name          string // Name of the test case.
+		input         string // Input user ID for the GetUserByID method.
+		expectedError bool   // Expected error: true if an error is expected.
 	}{
 		{
 			name:          "Valid ID",
@@ -173,6 +187,8 @@ func TestMockGetUserByID(t *testing.T) {
 	}
 }
 
+// TestMockAddUser tests the AddUser method of the mock authentication service.
+// It verifies that a user can be added to the mock service and is stored correctly.
 func TestMockAddUser(t *testing.T) {
 	mockService := NewMockService()
 	user := models.User{
@@ -188,6 +204,8 @@ func TestMockAddUser(t *testing.T) {
 	require.Equal(t, user.ID, mockService.users[user.ID].ID)
 }
 
+// TestMockDeleteUser tests the DeleteUser method of the mock authentication service.
+// It verifies that a user can be deleted from the mock service and is no longer stored.
 func TestMockDeleteUser(t *testing.T) {
 	mockService := NewMockService()
 	user := models.User{

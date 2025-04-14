@@ -1,3 +1,7 @@
+// Package database provides functionality for managing database connections and operations.
+// It includes methods for initializing the database, performing migrations, and executing
+// CRUD operations on user data. This package is essential for interacting with the application's
+// persistent storage layer.
 package database
 
 import (
@@ -19,6 +23,13 @@ import (
 
 // setupPostgresContainer starts a PostgreSQL container using testcontainers-go
 // and returns the container along with a DSN (Data Source Name) string.
+//
+// Parameters:
+//   - t: The testing context.
+//
+// Returns:
+//   - tc.Container: The started PostgreSQL container.
+//   - string: The DSN string for connecting to the database.
 func setupPostgresContainer(t *testing.T) (tc.Container, string) {
 	ctx := context.Background()
 
@@ -52,8 +63,10 @@ func setupPostgresContainer(t *testing.T) (tc.Container, string) {
 	return container, dsn
 }
 
-// TestDatabaseOperations tests the functionality in db.go:
+// TestDatabaseOperations tests the functionality in db.go.
 // It covers initialization, automigration, creation, and query operations for a user.
+//
+// This test uses a PostgreSQL container to simulate a real database environment.
 func TestDatabaseOperations(t *testing.T) {
 	ctx := context.Background()
 	// Start the PostgreSQL container.

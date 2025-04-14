@@ -1,3 +1,7 @@
+// Package config provides functionality for loading and managing application configuration.
+// It retrieves configuration values from environment variables and ensures that all required
+// settings are properly initialized. This package is essential for setting up the application's
+// runtime environment, including database connections, JWT secrets, and server settings.
 package config
 
 import (
@@ -9,21 +13,31 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Config represents the application configuration.
+// It contains environment-specific settings such as the environment name,
+// server port, JWT secret, and database URL.
 type Config struct {
-	Env       string
-	Port      string
-	JWTSecret []byte
-	DBUrl     string
+	Env       string // The current environment (e.g., "dev", "prod").
+	Port      string // The port on which the server will run.
+	JWTSecret []byte // The secret key used for signing JWT tokens.
+	DBUrl     string // The URL for connecting to the database.
 }
 
 const (
-	envKey        = "ENV"
-	portEnv       = "PORT"
-	jwtSecretKey  = "JWT_SECRET"
-	dbUrlKey      = "DB_URL"
-	defaultEnvKey = "dev"
+	envKey        = "ENV"        // Environment variable key for the environment name.
+	portEnv       = "PORT"       // Environment variable key for the server port.
+	jwtSecretKey  = "JWT_SECRET" // Environment variable key for the JWT secret.
+	dbUrlKey      = "DB_URL"     // Environment variable key for the database URL.
+	defaultEnvKey = "dev"        // Default environment name if none is provided.
 )
 
+// Load retrieves the application configuration from environment variables.
+// It ensures that all required configuration values are set and returns an error
+// if any mandatory value is missing.
+//
+// Returns:
+//   - Config: The loaded application configuration.
+//   - error: An error if any required configuration value is missing.
 func Load() (Config, error) {
 	var c Config
 
@@ -50,6 +64,14 @@ func Load() (Config, error) {
 	return c, nil
 }
 
+// getEnv retrieves the value of an environment variable.
+// If the variable is not set, it logs an error and returns an empty string.
+//
+// Parameters:
+//   - key: The name of the environment variable to retrieve.
+//
+// Returns:
+//   - string: The value of the environment variable, or an empty string if not set.
 func getEnv(key string) string {
 	log.Logger = log.Output(zerolog.ConsoleWriter{
 		Out:        os.Stdout,

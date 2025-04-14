@@ -1,3 +1,7 @@
+// Package auth provides core authentication functionalities, including user registration,
+// login, password hashing and verification, and JWT token management. It is designed
+// to handle secure authentication workflows and integrate with the application's database
+// and middleware layers.
 package auth
 
 import (
@@ -11,16 +15,33 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Service represents the authentication service.
+// It provides methods for user registration, login, and user retrieval.
 type Service struct {
-	db database.Repository
+	db database.Repository // Database repository for user data.
 }
 
+// NewService creates a new instance of the authentication service.
+//
+// Parameters:
+//   - db: The database repository to be used by the service.
+//
+// Returns:
+//   - *Service: A pointer to the newly created authentication service.
 func NewService(db database.Repository) *Service {
 	return &Service{
 		db: db,
 	}
 }
 
+// Register registers a new user in the system.
+//
+// Parameters:
+//   - data: The registration data containing the user's email and password.
+//
+// Returns:
+//   - string: The ID of the newly registered user.
+//   - error: An error if the registration fails.
 func (s *Service) Register(data models.RegisterAPI) (string, error) {
 	if _, err := mail.ParseAddress(data.Email); err != nil {
 		log.Error().Err(err).Msg("email address is not valid")
@@ -49,6 +70,14 @@ func (s *Service) Register(data models.RegisterAPI) (string, error) {
 	return user.ID, s.db.Create(user)
 }
 
+// Login authenticates a user by verifying their email and password.
+//
+// Parameters:
+//   - data: The login data containing the user's email and password.
+//
+// Returns:
+//   - string: The ID of the authenticated user.
+//   - error: An error if the authentication fails.
 func (s *Service) Login(data models.LoginAPI) (string, error) {
 	if data.Email == "" || data.Password == "" {
 		log.Error().Msg("email or password is empty")
@@ -75,6 +104,14 @@ func (s *Service) Login(data models.LoginAPI) (string, error) {
 	return "", errors.New("email or password is wrong")
 }
 
+// GetUserByID retrieves a user by their ID.
+//
+// Parameters:
+//   - id: The ID of the user to retrieve.
+//
+// Returns:
+//   - models.User: The user data.
+//   - error: An error if the retrieval fails or the ID is empty.
 func (s *Service) GetUserByID(id string) (models.User, error) {
 	if id == "" {
 		return models.User{}, errors.New("id cannot be empty")

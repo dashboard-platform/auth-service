@@ -1,3 +1,7 @@
+// Package auth provides core authentication functionalities, including user registration,
+// login, password hashing and verification, and JWT token management. It is designed
+// to handle secure authentication workflows and integrate with the application's database
+// and middleware layers.
 package auth
 
 import (
@@ -11,12 +15,18 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// MockService represents a mock implementation of the authentication service.
+// It is used for testing purposes and simulates user registration, login, and retrieval.
 type MockService struct {
-	mu     sync.Mutex
-	users  map[string]models.User
-	logins map[string]string
+	mu     sync.Mutex             // Mutex to ensure thread-safe operations.
+	users  map[string]models.User // Map to store user data by user ID.
+	logins map[string]string      // Map to store login credentials by email.
 }
 
+// NewMockService creates a new instance of the mock authentication service.
+//
+// Returns:
+//   - *MockService: A pointer to the newly created mock service.
 func NewMockService() *MockService {
 	return &MockService{
 		users:  make(map[string]models.User),
@@ -24,6 +34,14 @@ func NewMockService() *MockService {
 	}
 }
 
+// Register registers a new user in the mock service.
+//
+// Parameters:
+//   - input: The registration data containing the user's email and password.
+//
+// Returns:
+//   - string: The ID of the newly registered user.
+//   - error: An error if the registration fails.
 func (m *MockService) Register(input models.RegisterAPI) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -52,6 +70,14 @@ func (m *MockService) Register(input models.RegisterAPI) (string, error) {
 	return id, nil
 }
 
+// Login authenticates a user in the mock service.
+//
+// Parameters:
+//   - input: The login data containing the user's email and password.
+//
+// Returns:
+//   - string: The ID of the authenticated user.
+//   - error: An error if the authentication fails.
 func (m *MockService) Login(input models.LoginAPI) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -69,6 +95,14 @@ func (m *MockService) Login(input models.LoginAPI) (string, error) {
 	return "", errors.New("invalid credentials")
 }
 
+// GetUserByID retrieves a user by their ID from the mock service.
+//
+// Parameters:
+//   - id: The ID of the user to retrieve.
+//
+// Returns:
+//   - models.User: The user data.
+//   - error: An error if the user is not found.
 func (m *MockService) GetUserByID(id string) (models.User, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -80,6 +114,10 @@ func (m *MockService) GetUserByID(id string) (models.User, error) {
 	return u, nil
 }
 
+// AddUser adds a user to the mock service.
+//
+// Parameters:
+//   - input: The user data to add.
 func (m *MockService) AddUser(input models.User) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -88,6 +126,10 @@ func (m *MockService) AddUser(input models.User) {
 	m.logins[input.Email] = input.PasswordHash
 }
 
+// DeleteUser deletes a user from the mock service.
+//
+// Parameters:
+//   - id: The ID of the user to delete.
 func (m *MockService) DeleteUser(id string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()

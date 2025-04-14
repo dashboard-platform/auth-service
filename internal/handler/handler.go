@@ -1,3 +1,5 @@
+// Package handler provides HTTP handlers for the authentication service.
+// These handlers process incoming requests, interact with the service layer, and return responses.
 package handler
 
 import (
@@ -7,11 +9,21 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// HTTPHandler represents the HTTP handlers for the authentication service.
+// It includes methods for health checks, user registration, login, and retrieving user details.
 type HTTPHandler struct {
-	auth auth.ServiceInterface
-	jwt  *auth.JWTObj
+	auth auth.ServiceInterface // The authentication service interface.
+	jwt  *auth.JWTObj          // The JWT utility object.
 }
 
+// New creates a new instance of HTTPHandler.
+//
+// Parameters:
+//   - authService: The authentication service implementation.
+//   - jwtObj: The JWT utility object.
+//
+// Returns:
+//   - HTTPHandler: A new instance of the HTTPHandler.
 func New(authService auth.ServiceInterface, jwtObj *auth.JWTObj) HTTPHandler {
 	return HTTPHandler{
 		auth: authService,
@@ -19,6 +31,10 @@ func New(authService auth.ServiceInterface, jwtObj *auth.JWTObj) HTTPHandler {
 	}
 }
 
+// Healthcheck handles the health check endpoint.
+//
+// Returns:
+//   - fiber.StatusOK: If the service is running.
 func (h *HTTPHandler) Healthcheck(ctx *fiber.Ctx) error {
 	log.Info().Msg("Healthcheck called")
 
@@ -28,6 +44,15 @@ func (h *HTTPHandler) Healthcheck(ctx *fiber.Ctx) error {
 	})
 }
 
+// Register handles user registration requests.
+//
+// Parameters:
+//   - ctx: The Fiber context containing the request data.
+//
+// Returns:
+//   - fiber.StatusCreated: If the user is successfully registered.
+//   - fiber.StatusBadRequest: If the request data is invalid.
+//   - fiber.StatusInternalServerError: If an internal error occurs.
 func (h *HTTPHandler) Register(ctx *fiber.Ctx) error {
 	var data models.RegisterAPI
 
@@ -55,6 +80,15 @@ func (h *HTTPHandler) Register(ctx *fiber.Ctx) error {
 	})
 }
 
+// Login handles user login requests.
+//
+// Parameters:
+//   - ctx: The Fiber context containing the request data.
+//
+// Returns:
+//   - fiber.StatusOK: If the user is successfully authenticated.
+//   - fiber.StatusBadRequest: If the request data is invalid.
+//   - fiber.StatusInternalServerError: If an internal error occurs.
 func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 	var data models.LoginAPI
 
@@ -71,13 +105,6 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
 			Error: true,
 			Data:  "invalid login credentials",
-		})
-	}
-
-	if id == "" {
-		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": true,
-			"data":  "invalid login credentials",
 		})
 	}
 
@@ -99,26 +126,15 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 	})
 }
 
-/* TODO: move this to api-gateway.
-func (h *HTTPHandler) Logout(ctx *fiber.Ctx) error {
-	ctx.Cookie(&fiber.Cookie{
-		Name:     "access_token",
-		Value:    "",
-		Expires:  time.Now().Add(-time.Hour),
-		MaxAge:   -1,
-		HTTPOnly: true,
-		Secure:   false,
-		SameSite: "Lax",
-		Path:     "/",
-	})
-
-	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
-		"error": false,
-		"data":  "logged out successfully",
-	})
-}
-*/
-
+// GetMe retrieves the details of the authenticated user.
+//
+// Parameters:
+//   - ctx: The Fiber context containing the user ID.
+//
+// Returns:
+//   - fiber.StatusOK: If the user details are successfully retrieved.
+//   - fiber.StatusUnauthorized: If the user is not authenticated.
+//   - fiber.StatusInternalServerError: If an internal error occurs.
 func (h *HTTPHandler) GetMe(ctx *fiber.Ctx) error {
 	userID, ok := ctx.Locals("user_id").(string)
 	if !ok || userID == "" {

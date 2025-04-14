@@ -1,3 +1,5 @@
+// Package handler provides HTTP handlers for the authentication service.
+// These handlers process incoming requests, interact with the service layer, and return responses.
 package handler
 
 import (
@@ -13,6 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// setupTestApp initializes a Fiber app with mock services for testing.
+//
+// Returns:
+//   - *fiber.App: The initialized Fiber app.
+//   - *auth.MockService: The mock authentication service.
 func setupTestApp() (*fiber.App, *auth.MockService) {
 	app := fiber.New()
 
@@ -30,6 +37,8 @@ func setupTestApp() (*fiber.App, *auth.MockService) {
 
 	return app, fakeService
 }
+
+// TestHandlers_Healthcheck tests the Healthcheck handler.
 func TestHandlers_Healthcheck(t *testing.T) {
 	app, _ := setupTestApp()
 
@@ -40,6 +49,7 @@ func TestHandlers_Healthcheck(t *testing.T) {
 	require.Equal(t, fiber.StatusOK, resp.StatusCode)
 }
 
+// TestHandlers_Register tests the Register handler with various scenarios.
 func TestHandlers_Register(t *testing.T) {
 	app, _ := setupTestApp()
 
@@ -91,6 +101,7 @@ func TestHandlers_Register(t *testing.T) {
 	}
 }
 
+// TestHandlers_Login tests the Login handler with various scenarios.
 func TestHandlers_Login(t *testing.T) {
 	app, mockService := setupTestApp()
 	mockService.AddUser(models.User{
@@ -147,6 +158,7 @@ func TestHandlers_Login(t *testing.T) {
 	}
 }
 
+// TestHandlers_GetMe tests the GetMe handler with various scenarios.
 func TestHandlers_GetMe(t *testing.T) {
 	app, mockService := setupTestApp()
 

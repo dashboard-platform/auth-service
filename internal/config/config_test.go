@@ -1,3 +1,7 @@
+// Package config provides functionality for loading and managing application configuration.
+// It retrieves configuration values from environment variables and ensures that all required
+// settings are properly initialized. This package is essential for setting up the application's
+// runtime environment, including database connections, JWT secrets, and server settings.
 package config
 
 import (
@@ -8,14 +12,16 @@ import (
 )
 
 // TestGetEnv tests the getEnv function to ensure it retrieves the correct environment variable value.
+// It verifies that the function returns the expected value for existing environment variables
+// and an empty string for non-existent variables.
 func TestGetEnv(t *testing.T) {
 	os.Setenv("test", "test")
 	defer os.Unsetenv("test")
 
 	tests := []struct {
-		name string
-		key  string
-		want string
+		name string // Name of the test case.
+		key  string // The environment variable key to retrieve.
+		want string // The expected value of the environment variable.
 	}{
 		{
 			name: "Test ENV variable",
@@ -38,6 +44,8 @@ func TestGetEnv(t *testing.T) {
 }
 
 // TestLoad tests the Load function to ensure it correctly loads the configuration from environment variables.
+// It verifies that the function returns a valid configuration when all required environment variables are set
+// and returns an error when any mandatory variable is missing.
 func TestLoad(t *testing.T) {
 	envs := []string{envKey, portEnv, jwtSecretKey, dbUrlKey, "test"}
 	for _, env := range envs {
@@ -46,9 +54,9 @@ func TestLoad(t *testing.T) {
 	}
 
 	tests := []struct {
-		name    string
-		envs    []string
-		wantErr bool
+		name    string   // Name of the test case.
+		envs    []string // List of environment variables to set for the test.
+		wantErr bool     // Expected error: true if an error is expected.
 	}{
 		{
 			name:    "Test Load with all envs set",
