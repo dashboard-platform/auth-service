@@ -25,10 +25,13 @@ go run cmd/main.go
 
 `.env` file example: (for details, see below)
 ```env
-   PORT=8080
-   DB_URL=host=localhost user=postgres password=secret dbname=authdb port=5432
-   JWT_SECRET=your-super-secret
-   ENV=dev
+PORT=8080
+DB_URL=host=localhost user=postgres password=secret dbname=authdb port=5432
+JWT_SECRET=your-super-secret
+ENV=dev
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URL=your-google-redirect-url
 ```
 
 ### Option 2: Run with Docker Compose (recommended for testing)
