@@ -159,6 +159,14 @@ func (h *HTTPHandler) GoogleLogin(ctx *fiber.Ctx) error {
 		RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
 	}
 
+	if client.ClientID == "" || client.ClientSecret == "" || client.RedirectURL == "" {
+		log.Error().Msg("missing Google OAuth credentials in environment variables")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
+			Error: true,
+			Data:  "unexpected internal error",
+		})
+	}
+
 	email, err := client.ExchangeCode(body.Code)
 	if err != nil {
 		log.Error().Err(err).Msg("error exchanging code for token")
