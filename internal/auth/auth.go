@@ -6,6 +6,7 @@ package auth
 
 import (
 	"errors"
+	"fmt"
 	"net/mail"
 	"time"
 
@@ -64,6 +65,7 @@ func (s *Service) Register(data models.RegisterAPI) (string, error) {
 		ID:           uuid.New().String(),
 		Email:        data.Email,
 		PasswordHash: hashed,
+		AuthProvider: "password",
 		CreatedAt:    t,
 		UpdatedAt:    t,
 	}
@@ -88,6 +90,10 @@ func (s *Service) Login(data models.LoginAPI) (string, error) {
 	if err != nil {
 		log.Error().Err(err).Msg("email not found")
 		return "", err
+	}
+
+	if fetched.AuthProvider != "password" {
+		return "", fmt.Errorf("this email is registered via %s login", fetched.AuthProvider)
 	}
 
 	ok, err := verifyPassword(fetched.PasswordHash, data.Password)
@@ -128,6 +134,7 @@ func (s *Service) LoginOrRegisterOAuth(email string) (string, error) {
 		ID:           uuid.New().String(),
 		Email:        email,
 		PasswordHash: "",
+		AuthProvider: "google",
 		CreatedAt:    t,
 		UpdatedAt:    t,
 	}

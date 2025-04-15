@@ -21,10 +21,6 @@ type GoogleOAuthAPI struct {
 	RedirectURL  string
 }
 
-type tokenResponse struct {
-	IDToken string `json:"id_token"`
-}
-
 type googleClaims struct {
 	Email         string `json:"email"`
 	EmailVerified bool   `json:"email_verified"`
