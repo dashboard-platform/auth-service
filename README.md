@@ -83,6 +83,7 @@ go tests -v ./...
 | GET    | `/auth/healthcheck` | ❌             | Basic service status              |
 | POST   | `/auth/register`    | ❌             | Create new user account           |
 | POST   | `/auth/login`       | ❌             | Authenticate user and return JWT  |
+| POST   | `/auth/google`      | ❌             | Authenticate via Google OAuth     |
 | GET    | `/auth/me`          | ✅             | Return current user's information |
 
 > ⚠️ The `/logout` logic should be handled by the API Gateway, not this service.
