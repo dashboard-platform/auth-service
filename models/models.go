@@ -18,10 +18,10 @@ type LoginAPI struct {
 
 // User represents the database entity for a user.
 type User struct {
-	ID           string    `gorm:"type:uuid;primaryKey" json:"id"`        // The unique identifier of the user.
-	Email        string    `gorm:"uniqueIndex;not null" json:"email"`     // The email address of the user.
-	PasswordHash string    `gorm:"not null" json:"-"`                     // The hashed password of the user.
-	AuthProvider string    `gorm:"default:password" json:"auth_provider"` // The authentication provider used by the user (e.g., password, google).
-	CreatedAt    time.Time `json:"created_at"`                            // The timestamp when the user was created.
-	UpdatedAt    time.Time `json:"updated_at"`                            // The timestamp when the user was last updated.
+	ID           string    `gorm:"type:uuid;primaryKey" json:"id"`                 // The unique identifier of the user.
+	Email        string    `gorm:"uniqueIndex;not null" json:"email"`              // The email address of the user.
+	PasswordHash string    `gorm:"not null" json:"-"`                              // The hashed password of the user.
+	AuthProvider string    `gorm:"not null;default:password" json:"auth_provider"` // "password", "google" // The authentication provider used by the user (e.g., password, google).
+	CreatedAt    time.Time `json:"created_at"`                                     // The timestamp when the user was created.
+	UpdatedAt    time.Time `json:"updated_at"`                                     // The timestamp when the user was last updated.
 }

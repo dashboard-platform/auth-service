@@ -126,6 +126,9 @@ func (s *Service) Login(data models.LoginAPI) (string, error) {
 func (s *Service) LoginOrRegisterOAuth(email string) (string, error) {
 	user, err := s.db.Fetch(email)
 	if err == nil {
+		if user.AuthProvider != "google" {
+			return "", fmt.Errorf("this email is registered with %s login", user.AuthProvider)
+		}
 		return user.ID, nil
 	}
 
