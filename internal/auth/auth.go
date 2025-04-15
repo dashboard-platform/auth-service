@@ -104,6 +104,36 @@ func (s *Service) Login(data models.LoginAPI) (string, error) {
 	return "", errors.New("email or password is wrong")
 }
 
+// LoginOrRegisterOAuth handles user login or registration via OAuth.
+//
+// This method is used when a user logs in using an OAuth provider (for now, Google).
+// If the user already exists in the database, their ID is returned. If the user
+// does not exist, a new user is created with the provided email, and their ID
+// is returned.
+//
+// Parameters:
+//   - email: The email address of the user obtained from the OAuth provider.
+//
+// Returns:
+//   - string: The ID of the user (existing or newly created).
+//   - error: An error if the operation fails (e.g., database issues).
+func (s *Service) LoginOrRegisterOAuth(email string) (string, error) {
+	user, err := s.db.Fetch(email)
+	if err == nil {
+		return user.ID, nil
+	}
+
+	t := time.Now()
+	user = models.User{
+		ID:           uuid.New().String(),
+		Email:        email,
+		PasswordHash: "",
+		CreatedAt:    t,
+		UpdatedAt:    t,
+	}
+	return user.ID, s.db.Create(user)
+}
+
 // GetUserByID retrieves a user by their ID.
 //
 // Parameters:
@@ -117,5 +147,5 @@ func (s *Service) GetUserByID(id string) (models.User, error) {
 		return models.User{}, errors.New("id cannot be empty")
 	}
 
-	return s.db.Fetch(id)
+	return s.db.FetchByID(id)
 }

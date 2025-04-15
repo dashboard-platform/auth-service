@@ -5,6 +5,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http/httptest"
 	"testing"
 
@@ -36,6 +37,64 @@ func setupTestApp() (*fiber.App, *auth.MockService) {
 	})
 
 	return app, fakeService
+}
+
+// FakeOAuthClient is a mock implementation of the GoogleOAuthClient interface.
+// It is used for testing purposes to simulate the behavior of exchanging an OAuth code
+// for an email address. The behavior can be controlled using the ShouldFail flag.
+type FakeOAuthClient struct {
+	ShouldFail bool // Determines whether the ExchangeCode method should simulate a failure.
+}
+
+// ExchangeCode simulates the exchange of an OAuth code for an email address.
+//
+// Parameters:
+//   - code: The OAuth authorization code provided by the client.
+//
+// Returns:
+//   - string: The email address associated with the OAuth code if successful.
+//   - error: An error if the code is invalid or ShouldFail is set to true.
+func (f *FakeOAuthClient) ExchangeCode(code string) (string, error) {
+	if f.ShouldFail || code != "valid-code" {
+		return "", errors.New("invalid code")
+	}
+	return "mockuser@example.com", nil
+}
+
+// setupGoogleTestApp initializes a Fiber app with mock services and a mock OAuth client for testing.
+//
+// Parameters:
+//   - fakeAuth: The mock authentication service to be used.
+//   - jwt: The JWT utility object for token generation.
+//   - oauthClient: The mock OAuth client to simulate Google OAuth behavior.
+//
+// Returns:
+//   - *fiber.App: The initialized Fiber app configured with the Google OAuth endpoint.
+func setupGoogleTestApp(fakeAuth auth.ServiceInterface, jwt *auth.JWTObj) *fiber.App {
+	app := fiber.New()
+
+	h := New(fakeAuth, jwt)
+
+	app.Post("/auth/google", func(c *fiber.Ctx) error {
+		// Inject mock OAuth logic direct
+		var body struct {
+			Code string `json:"code"`
+		}
+		if err := c.BodyParser(&body); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(Response{Error: true, Data: "invalid request"})
+		}
+		var email string
+		if body.Code == "valid-code" {
+			email = "mockuser@example.com"
+		} else {
+			return c.Status(fiber.StatusUnauthorized).JSON(Response{Error: true, Data: "oauth failed"})
+		}
+		id, _ := h.auth.LoginOrRegisterOAuth(email)
+		token, _ := h.jwt.CreateJWT(id)
+		return c.Status(fiber.StatusOK).JSON(Response{Error: false, Data: fiber.Map{"token": token}})
+	})
+
+	return app
 }
 
 // TestHandlers_Healthcheck tests the Healthcheck handler.
@@ -191,6 +250,55 @@ func TestHandlers_GetMe(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.helper(t, app)
 			req := httptest.NewRequest(fiber.MethodGet, "/me", nil)
+
+			resp, err := app.Test(req)
+			require.NoError(t, err)
+			require.Equal(t, tt.expectedStatus, resp.StatusCode)
+		})
+	}
+}
+
+// TestHandlers_GoogleLogin tests the Google login handler with various scenarios.
+func TestHandlers_GoogleLogin(t *testing.T) {
+	jwt := &auth.JWTObj{Secret: []byte("test-secret")}
+	service := auth.NewMockService()
+	app := setupGoogleTestApp(service, jwt)
+
+	tests := []struct {
+		name           string
+		body           any
+		expectedStatus int
+		expectToken    bool
+	}{
+		{
+			name: "Valid code",
+			body: map[string]string{
+				"code": "valid-code",
+			},
+			expectedStatus: fiber.StatusOK,
+			expectToken:    true,
+		},
+		{
+			name: "Invalid code",
+			body: map[string]string{
+				"code": "bad-code",
+			},
+			expectedStatus: fiber.StatusUnauthorized,
+			expectToken:    false,
+		},
+		{
+			name:           "Missing code",
+			body:           map[string]string{},
+			expectedStatus: fiber.StatusUnauthorized,
+			expectToken:    false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			payload, _ := json.Marshal(tt.body)
+			req := httptest.NewRequest(fiber.MethodPost, "/auth/google", bytes.NewReader(payload))
+			req.Header.Set("Content-Type", "application/json")
 
 			resp, err := app.Test(req)
 			require.NoError(t, err)

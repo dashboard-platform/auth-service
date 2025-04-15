@@ -3,6 +3,8 @@
 package handler
 
 import (
+	"os"
+
 	"github.com/dashboard-platform/auth-service/internal/auth"
 	"github.com/dashboard-platform/auth-service/models"
 	"github.com/gofiber/fiber/v2"
@@ -122,6 +124,75 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 		Error: false,
 		Data: fiber.Map{
 			"token": token,
+		},
+	})
+}
+
+// GoogleLogin handles user login via Google OAuth.
+//
+// This method processes the OAuth code provided by the client, exchanges it for
+// an access token, retrieves the user's email, and either logs in or registers
+// the user in the system. A JWT token is then generated and returned to the client.
+//
+// Parameters:
+//   - ctx: The Fiber context containing the request data.
+//
+// Returns:
+//   - fiber.StatusOK: If the user is successfully authenticated or registered.
+//   - fiber.StatusBadRequest: If the request data is invalid.
+//   - fiber.StatusInternalServerError: If an internal error occurs.
+func (h *HTTPHandler) GoogleLogin(ctx *fiber.Ctx) error {
+	var body struct {
+		Code string `json:"code"`
+	}
+	if err := ctx.BodyParser(&body); err != nil {
+		log.Error().Err(err).Msg("error reading/parsing HTTP request body data")
+		return ctx.Status(fiber.StatusBadRequest).JSON(Response{
+			Error: true,
+			Data:  "invalid data provided",
+		})
+	}
+
+	client := auth.GoogleOAuthAPI{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  os.Getenv("GOOGLE_REDIRECT_URL"),
+	}
+
+	email, err := client.ExchangeCode(body.Code)
+	if err != nil {
+		log.Error().Err(err).Msg("error exchanging code for token")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
+			Error: true,
+			Data:  "unexpected internal error",
+		})
+	}
+
+	userID, err := h.auth.LoginOrRegisterOAuth(email)
+	if err != nil {
+		log.Error().Err(err).Msg("error logging in or registering user")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
+			Error: true,
+			Data:  "unexpected internal error",
+		})
+	}
+
+	token, err := h.jwt.CreateJWT(userID)
+	if err != nil {
+		log.Error().Err(err).Msg("error creating JWT token")
+		return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
+			Error: true,
+			Data:  "unexpected internal error",
+		})
+	}
+
+	ctx.Locals("user_id", userID)
+
+	return ctx.Status(fiber.StatusOK).JSON(Response{
+		Error: false,
+		Data: fiber.Map{
+			"token": token,
+			"email": email,
 		},
 	})
 }

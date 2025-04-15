@@ -79,6 +79,7 @@ func main() {
 	app.Get("/auth/healthcheck", h.Healthcheck)
 	app.Post("/auth/register", h.Register)
 	app.Post("/auth/login", h.Login)
+	app.Post("/auth/google", h.GoogleLogin)
 	app.Get("/auth/me", middleware.RequireAuth(&jwtObj), h.GetMe)
 
 	// Start the HTTP server.

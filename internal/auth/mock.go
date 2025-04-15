@@ -95,6 +95,41 @@ func (m *MockService) Login(input models.LoginAPI) (string, error) {
 	return "", errors.New("invalid credentials")
 }
 
+// LoginOrRegisterOAuth handles user login or registration via OAuth in the mock service.
+//
+// This method simulates the behavior of logging in or registering a user using an OAuth provider.
+// If the user already exists in the mock database, their ID is returned. If the user does not exist,
+// a new user is created with the provided email, and their ID is returned.
+//
+// Parameters:
+//   - email: The email address of the user obtained from the OAuth provider.
+//
+// Returns:
+//   - string: The ID of the user (existing or newly created).
+//   - error: An error if the operation fails (e.g., database issues).
+func (m *MockService) LoginOrRegisterOAuth(email string) (string, error) {
+	defer m.mu.Unlock()
+	m.mu.Lock()
+
+	for id, u := range m.users {
+		if u.Email == email {
+			return id, nil
+		}
+	}
+
+	t := time.Now()
+	user := models.User{
+		ID:           uuid.New().String(),
+		Email:        email,
+		PasswordHash: "",
+		CreatedAt:    t,
+		UpdatedAt:    t,
+	}
+
+	m.users[user.ID] = user
+	return user.ID, nil
+}
+
 // GetUserByID retrieves a user by their ID from the mock service.
 //
 // Parameters:

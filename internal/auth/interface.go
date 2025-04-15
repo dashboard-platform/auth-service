@@ -9,6 +9,7 @@ import "github.com/dashboard-platform/auth-service/models"
 type ServiceInterface interface {
 	Register(data models.RegisterAPI) (string, error)
 	Login(data models.LoginAPI) (string, error)
+	LoginOrRegisterOAuth(email string) (string, error)
 	GetUserByID(id string) (models.User, error)
 }
 
