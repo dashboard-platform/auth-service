@@ -3,12 +3,15 @@
 package handler
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/dashboard-platform/auth-service/internal/auth"
 	"github.com/dashboard-platform/auth-service/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 // HTTPHandler represents the HTTP handlers for the authentication service.
@@ -118,6 +121,15 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 		})
 	}
 
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "access_token",
+		Value:    token,
+		HTTPOnly: true,
+		Secure:   os.Getenv("ENV") != "dev", // use Secure only in production
+		SameSite: "Lax",
+		Path:     "/",
+		MaxAge:   60 * 60 * 1, // 1 hour
+	})
 	ctx.Locals("user_id", id)
 
 	return ctx.Status(fiber.StatusOK).JSON(Response{
@@ -126,6 +138,31 @@ func (h *HTTPHandler) Login(ctx *fiber.Ctx) error {
 			"token": token,
 		},
 	})
+}
+
+func (h *HTTPHandler) GoogleRedirect(ctx *fiber.Ctx) error {
+	// Încarcă din env
+	clientID := os.Getenv("GOOGLE_CLIENT_ID")
+	clientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")
+	redirectURL := os.Getenv("GOOGLE_REDIRECT_URL") // ex: http://localhost:5173/auth/google/callback
+
+	if clientID == "" || clientSecret == "" || redirectURL == "" {
+		return ctx.Status(fiber.StatusInternalServerError).SendString("OAuth2 Google misconfigured")
+	}
+
+	conf := &oauth2.Config{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		RedirectURL:  redirectURL,
+		Scopes:       []string{"openid", "email", "profile"},
+		Endpoint:     google.Endpoint,
+	}
+
+	state := "some-random-state"
+	authURL := conf.AuthCodeURL(state, oauth2.AccessTypeOffline)
+
+	// Redirect către Google
+	return ctx.Status(http.StatusTemporaryRedirect).Redirect(authURL)
 }
 
 // GoogleLogin handles user login via Google OAuth.
@@ -167,6 +204,14 @@ func (h *HTTPHandler) GoogleLogin(ctx *fiber.Ctx) error {
 		})
 	}
 
+	if body.Code == "" {
+		log.Error().Msg("missing OAuth code in request body")
+		return ctx.Status(fiber.StatusBadRequest).JSON(Response{
+			Error: true,
+			Data:  "missing code in request body",
+		})
+	}
+
 	email, err := client.ExchangeCode(body.Code)
 	if err != nil {
 		log.Error().Err(err).Msg("error exchanging code for token")
@@ -194,6 +239,15 @@ func (h *HTTPHandler) GoogleLogin(ctx *fiber.Ctx) error {
 		})
 	}
 
+	ctx.Cookie(&fiber.Cookie{
+		Name:     "access_token",
+		Value:    token,
+		HTTPOnly: true,
+		Secure:   os.Getenv("ENV") != "dev", // use Secure only in production
+		SameSite: "Lax",
+		Path:     "/",
+		MaxAge:   60 * 60 * 1, // 1 hour
+	})
 	ctx.Locals("user_id", userID)
 
 	return ctx.Status(fiber.StatusOK).JSON(Response{

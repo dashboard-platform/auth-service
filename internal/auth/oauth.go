@@ -45,9 +45,6 @@ func (g *GoogleOAuthAPI) ExchangeCode(code string) (string, error) {
 		return "", err
 	}
 
-	// DEBUG:
-	fmt.Println("Body:", string(bodyBytes))
-
 	var tokenResp struct {
 		AccessToken string `json:"access_token"`
 		IDToken     string `json:"id_token"`

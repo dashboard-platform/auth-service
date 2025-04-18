@@ -12,7 +12,6 @@ import (
 	"github.com/dashboard-platform/auth-service/internal/logger"
 	"github.com/dashboard-platform/auth-service/internal/middleware"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	_ "github.com/joho/godotenv/autoload"
@@ -52,12 +51,6 @@ func main() {
 	// Initialize the Fiber app with middleware.
 	app := fiber.New()
 	app.Use(
-		// Set CORS configuration.
-		cors.New(cors.Config{
-			AllowHeaders: "Origin, Content-Type, Accept, Authorization",
-			AllowMethods: "GET, POST, PUT, DELETE",
-		}),
-
 		// Add security headers.
 		helmet.New(),
 
@@ -79,7 +72,8 @@ func main() {
 	app.Get("/auth/healthcheck", h.Healthcheck)
 	app.Post("/auth/register", h.Register)
 	app.Post("/auth/login", h.Login)
-	app.Post("/auth/google", h.GoogleLogin)
+	app.Get("/auth/google", h.GoogleRedirect)
+	app.Post("/auth/google/callback", h.GoogleLogin)
 	app.Get("/auth/me", middleware.RequireAuth(&jwtObj), h.GetMe)
 
 	// Start the HTTP server.
