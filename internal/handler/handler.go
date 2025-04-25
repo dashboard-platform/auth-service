@@ -212,7 +212,7 @@ func (h *HTTPHandler) GoogleLogin(ctx *fiber.Ctx) error {
 		})
 	}
 
-	email, err := client.ExchangeCode(body.Code)
+	claims, err := client.ExchangeCode(body.Code)
 	if err != nil {
 		log.Error().Err(err).Msg("error exchanging code for token")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
@@ -221,7 +221,10 @@ func (h *HTTPHandler) GoogleLogin(ctx *fiber.Ctx) error {
 		})
 	}
 
-	userID, err := h.auth.LoginOrRegisterOAuth(email)
+	userID, err := h.auth.LoginOrRegisterOAuth(models.RegisterAPI{
+		Name:  claims.Name,
+		Email: claims.Email,
+	})
 	if err != nil {
 		log.Error().Err(err).Msg("error logging in or registering user")
 		return ctx.Status(fiber.StatusInternalServerError).JSON(Response{
@@ -254,7 +257,8 @@ func (h *HTTPHandler) GoogleLogin(ctx *fiber.Ctx) error {
 		Error: false,
 		Data: fiber.Map{
 			"token": token,
-			"email": email,
+			"name":  claims.Name,
+			"email": claims.Email,
 		},
 	})
 }
@@ -289,6 +293,7 @@ func (h *HTTPHandler) GetMe(ctx *fiber.Ctx) error {
 		Error: false,
 		Data: fiber.Map{
 			"id":         user.ID,
+			"name":       user.Name,
 			"email":      user.Email,
 			"created_at": user.CreatedAt,
 			"updated_at": user.UpdatedAt,

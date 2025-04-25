@@ -24,9 +24,10 @@ type GoogleOAuthAPI struct {
 type googleClaims struct {
 	Email         string `json:"email"`
 	EmailVerified bool   `json:"email_verified"`
+	Name          string `json:"name"`
 }
 
-func (g *GoogleOAuthAPI) ExchangeCode(code string) (string, error) {
+func (g *GoogleOAuthAPI) ExchangeCode(code string) (googleClaims, error) {
 	values := make(url.Values)
 	values.Set("client_id", g.ClientID)
 	values.Set("client_secret", g.ClientSecret)
@@ -36,13 +37,13 @@ func (g *GoogleOAuthAPI) ExchangeCode(code string) (string, error) {
 
 	resp, err := http.PostForm("https://oauth2.googleapis.com/token", values)
 	if err != nil {
-		return "", err
+		return googleClaims{}, err
 	}
 	defer resp.Body.Close()
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		return googleClaims{}, err
 	}
 
 	var tokenResp struct {
@@ -52,30 +53,30 @@ func (g *GoogleOAuthAPI) ExchangeCode(code string) (string, error) {
 	}
 	err = json.Unmarshal(bodyBytes, &tokenResp)
 	if err != nil {
-		return "", err
+		return googleClaims{}, err
 	}
 
 	parts := strings.Split(tokenResp.IDToken, ".")
 	if len(parts) != 3 {
-		return "", fmt.Errorf("invalid ID token format")
+		return googleClaims{}, fmt.Errorf("invalid ID token format")
 	}
 
 	payload := parts[1]
 	decoded, err := decodeBase64URL(payload)
 	if err != nil {
-		return "", err
+		return googleClaims{}, err
 	}
 
 	var claims googleClaims
 	if err := json.Unmarshal(decoded, &claims); err != nil {
-		return "", err
+		return googleClaims{}, err
 	}
 
 	if !claims.EmailVerified {
-		return "", fmt.Errorf("email not verified")
+		return googleClaims{}, fmt.Errorf("email not verified")
 	}
 
-	return claims.Email, nil
+	return claims, nil
 }
 
 func decodeBase64URL(data string) ([]byte, error) {

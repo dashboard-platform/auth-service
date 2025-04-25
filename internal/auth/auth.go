@@ -44,6 +44,11 @@ func NewService(db database.Repository) *Service {
 //   - string: The ID of the newly registered user.
 //   - error: An error if the registration fails.
 func (s *Service) Register(data models.RegisterAPI) (string, error) {
+	if data.Name == "" {
+		log.Error().Msg("name is empty")
+		return "", errors.New("name is empty")
+	}
+
 	if _, err := mail.ParseAddress(data.Email); err != nil {
 		log.Error().Err(err).Msg("email address is not valid")
 		return "", err
@@ -63,6 +68,7 @@ func (s *Service) Register(data models.RegisterAPI) (string, error) {
 	t := time.Now()
 	user := models.User{
 		ID:           uuid.New().String(),
+		Name:         data.Name,
 		Email:        data.Email,
 		PasswordHash: hashed,
 		AuthProvider: "password",
@@ -123,8 +129,8 @@ func (s *Service) Login(data models.LoginAPI) (string, error) {
 // Returns:
 //   - string: The ID of the user (existing or newly created).
 //   - error: An error if the operation fails (e.g., database issues).
-func (s *Service) LoginOrRegisterOAuth(email string) (string, error) {
-	user, err := s.db.Fetch(email)
+func (s *Service) LoginOrRegisterOAuth(data models.RegisterAPI) (string, error) {
+	user, err := s.db.Fetch(data.Email)
 	if err == nil {
 		if user.AuthProvider != "google" {
 			return "", fmt.Errorf("this email is registered with %s login", user.AuthProvider)
@@ -135,7 +141,8 @@ func (s *Service) LoginOrRegisterOAuth(email string) (string, error) {
 	t := time.Now()
 	user = models.User{
 		ID:           uuid.New().String(),
-		Email:        email,
+		Name:         data.Name,
+		Email:        data.Email,
 		PasswordHash: "",
 		AuthProvider: "google",
 		CreatedAt:    t,
