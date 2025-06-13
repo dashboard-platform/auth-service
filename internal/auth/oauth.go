@@ -80,13 +80,5 @@ func (g *GoogleOAuthAPI) ExchangeCode(code string) (googleClaims, error) {
 }
 
 func decodeBase64URL(data string) ([]byte, error) {
-	pad := len(data) % 4
-	if pad > 0 {
-		data += strings.Repeat("=", 4-pad)
-	}
-	ret, err := url.QueryUnescape(data)
-	if err != nil {
-		return nil, err
-	}
-	return base64.StdEncoding.DecodeString(ret)
+	return base64.RawURLEncoding.DecodeString(data)
 }

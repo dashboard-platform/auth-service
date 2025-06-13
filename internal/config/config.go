@@ -46,21 +46,21 @@ func Load() (Config, error) {
 		c.Env = defaultEnvKey
 	}
 
-	c.Port = getEnv(portEnv)
+	c.Port = getEnv(portEnv, true)
 	if c.Port == "" {
-		return Config{}, errors.New("empty key")
+		return Config{}, errors.New("PORT environment variable is missing or empty")
 	}
 
-	c.JWTSecret = []byte(getEnv(jwtSecretKey))
+	jwtSecretStr := getEnv(jwtSecretKey, true)
+	c.JWTSecret = []byte(jwtSecretStr)
 	if len(c.JWTSecret) == 0 {
-		return Config{}, errors.New("empty key")
+		return Config{}, errors.New("JWT_SECRET environment variable is missing or empty")
 	}
 
-	c.DBUrl = getEnv(dbUrlKey)
+	c.DBUrl = getEnv(dbUrlKey, true)
 	if c.DBUrl == "" {
-		return Config{}, errors.New("empty key")
+		return Config{}, errors.New("DB_URL environment variable is missing or empty")
 	}
-
 	return c, nil
 }
 
@@ -72,14 +72,14 @@ func Load() (Config, error) {
 //
 // Returns:
 //   - string: The value of the environment variable, or an empty string if not set.
-func getEnv(key string) string {
+func getEnv(key string, required bool) string {
 	log.Logger = log.Output(zerolog.ConsoleWriter{
 		Out:        os.Stdout,
 		TimeFormat: time.RFC3339,
 	})
 
 	val := os.Getenv(key)
-	if val == "" {
+	if val == "" && required {
 		log.Error().Str("var", key).Msg("Failed to load environment")
 	}
 	return val

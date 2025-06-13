@@ -18,11 +18,12 @@ func TestRegisterLoginMeFlow(t *testing.T) {
 	password := "securepassword123"
 
 	client := &http.Client{
-		Timeout: 0,
+		Timeout: 10 * time.Second,
 	}
 
 	t.Run("Register User", func(t *testing.T) {
 		body := map[string]string{
+			"name":     "Test User E2E",
 			"email":    email,
 			"password": password,
 		}

@@ -37,7 +37,7 @@ func TestGetEnv(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := getEnv(tt.key)
+			got := getEnv(tt.key, false)
 			assert.Equal(t, tt.want, got)
 		})
 	}

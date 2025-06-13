@@ -89,7 +89,11 @@ func setupGoogleTestApp(fakeAuth auth.ServiceInterface, jwt *auth.JWTObj) *fiber
 		} else {
 			return c.Status(fiber.StatusUnauthorized).JSON(Response{Error: true, Data: "oauth failed"})
 		}
-		id, _ := h.auth.LoginOrRegisterOAuth(email)
+
+		id, err := h.auth.LoginOrRegisterOAuth(models.RegisterAPI{Email: email, Name: "Mock User"}) // Furnizează și Name
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(Response{Error: true, Data: "auth service error"})
+		}
 		token, _ := h.jwt.CreateJWT(id)
 		return c.Status(fiber.StatusOK).JSON(Response{Error: false, Data: fiber.Map{"token": token}})
 	})
@@ -119,17 +123,22 @@ func TestHandlers_Register(t *testing.T) {
 	}{
 		{
 			name:           "Register valid",
-			body:           models.RegisterAPI{Email: "test@example.com", Password: "securepass"},
+			body:           models.RegisterAPI{Name: "Test User", Email: "test@example.com", Password: "securepass"},
 			expectedStatus: fiber.StatusCreated,
 		},
 		{
 			name:           "Register invalid email",
-			body:           models.RegisterAPI{Email: "test", Password: "securepass"},
+			body:           models.RegisterAPI{Name: "Test User", Email: "test", Password: "securepass"},
 			expectedStatus: fiber.StatusInternalServerError,
 		},
 		{
 			name:           "Register invalid password",
-			body:           models.RegisterAPI{Email: "test@example.com", Password: ""},
+			body:           models.RegisterAPI{Name: "Test User", Email: "test@example.com", Password: ""},
+			expectedStatus: fiber.StatusInternalServerError,
+		},
+		{
+			name:           "Register missing name",
+			body:           models.RegisterAPI{Email: "test@example.com", Password: "securepass"}, // Name lipsește
 			expectedStatus: fiber.StatusInternalServerError,
 		},
 		{

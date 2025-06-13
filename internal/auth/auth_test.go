@@ -28,6 +28,7 @@ func TestService_Register(t *testing.T) {
 		{
 			name: "Register valid",
 			data: models.RegisterAPI{
+				Name:     "Test User",
 				Email:    "test@test.com",
 				Password: "securepass",
 			},
@@ -37,6 +38,7 @@ func TestService_Register(t *testing.T) {
 		{
 			name: "Register invalid email",
 			data: models.RegisterAPI{
+				Name:     "Test User",
 				Email:    "test",
 				Password: "securepass",
 			},
@@ -46,8 +48,19 @@ func TestService_Register(t *testing.T) {
 		{
 			name: "Register invalid password",
 			data: models.RegisterAPI{
+				Name:     "Test User",
 				Email:    "test@test.com",
 				Password: "",
+			},
+			expectedData: false,
+			expectedErr:  true,
+		},
+		{
+			name: "Register empty name",
+			data: models.RegisterAPI{
+				Name:     "",
+				Email:    "test@test.com",
+				Password: "securepassword",
 			},
 			expectedData: false,
 			expectedErr:  true,

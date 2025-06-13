@@ -46,6 +46,11 @@ func (m *MockService) Register(input models.RegisterAPI) (string, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
+	if input.Name == "" {
+		log.Error().Msg("name is empty for mock registration")
+		return "", errors.New("name is empty")
+	}
+
 	if _, err := mail.ParseAddress(input.Email); err != nil {
 		log.Error().Err(err).Msg("email address is not valid")
 		return "", err
@@ -59,6 +64,7 @@ func (m *MockService) Register(input models.RegisterAPI) (string, error) {
 	id := uuid.New().String()
 	user := models.User{
 		ID:           id,
+		Name:         input.Name,
 		Email:        input.Email,
 		PasswordHash: input.Password,
 		CreatedAt:    time.Now(),
@@ -107,12 +113,12 @@ func (m *MockService) Login(input models.LoginAPI) (string, error) {
 // Returns:
 //   - string: The ID of the user (existing or newly created).
 //   - error: An error if the operation fails (e.g., database issues).
-func (m *MockService) LoginOrRegisterOAuth(email string) (string, error) {
+func (m *MockService) LoginOrRegisterOAuth(data models.RegisterAPI) (string, error) {
 	defer m.mu.Unlock()
 	m.mu.Lock()
 
 	for id, u := range m.users {
-		if u.Email == email {
+		if u.Email == data.Email {
 			return id, nil
 		}
 	}
@@ -120,8 +126,10 @@ func (m *MockService) LoginOrRegisterOAuth(email string) (string, error) {
 	t := time.Now()
 	user := models.User{
 		ID:           uuid.New().String(),
-		Email:        email,
+		Name:         data.Name, // Adaugă numele din data
+		Email:        data.Email,
 		PasswordHash: "",
+		AuthProvider: "google", // Asigură-te că setezi provider-ul corect
 		CreatedAt:    t,
 		UpdatedAt:    t,
 	}
